@@ -1,4 +1,5 @@
 node_modules
 tmp
+test
 dist
 app/bower_components

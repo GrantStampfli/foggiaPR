@@ -24,8 +24,6 @@ var paths = (function() {
     'src.app.static': [
       'app/**/*',
       '!app/scripts/**/*',
-      '!app/templates/**/*',
-      '!app/templates',
       '!app/styles/**/*',
       '!app/bower_components/**/*',
       '!app/bower_components'
@@ -33,14 +31,12 @@ var paths = (function() {
     'src.app.scripts': ['app/scripts/**/*.js'],
     'src.app.scripts.entry': ['app/scripts/application.js'],
     'src.app.scripts.vendor': require('./app/scripts/vendor.json').include,
-    'src.app.templates': ['app/templates/**/*.{hbs,em}'],
     'src.app.styles': ['app/styles/**/*.scss'],
     'src.app.styles.entry': ['app/styles/application.scss'],
     'src.app.styles.vendor': ['app/styles/vendor.scss'],
     'src.app.tests': ['test/app/**/*.js'],
     'src.app.tests.fixtures': ['test/fixtures/**/*.json'],
     'src.app.tests.helpers': [
-      'app/bower_components/ember-mocha-adapter/adapter.js',
       'test/app_helper.js'
     ],
     'dest.root': '<%= dist %>',
@@ -54,8 +50,7 @@ var paths = (function() {
     var env = opts.env || 'development';
     var distribution = (env === 'distribution');
     var data = {
-      'dist': (distribution ? 'dist' : 'tmp'),
-      'ember_suffix': (distribution ? '.prod' : '')
+      'dist': (distribution ? 'dist' : 'tmp')
     };
     var result = table[name];
     if (typeof result === 'string') { result = _.template(result, data); }
@@ -142,7 +137,6 @@ tasks['.watch'] = function(options) {
 
   if (opts.app) {
     gulp.watch(paths('src.app.scripts', opts), ['lint', '.scripts:app:dev:update']);
-    gulp.watch(paths('src.app.templates', opts), ['.scripts:app:dev:update-templates']);
     gulp.watch(paths('src.app.styles', opts), ['.styles:app:dev:update']);
     gulp.watch(paths('src.app.static', opts), ['.static:app:dev']);
     gulp.watch([].concat(
@@ -171,27 +165,6 @@ tasks['.scripts:app'] = function(options) {
   if (opts.vendor) {
     streams.push(gulp.src(paths('src.app.scripts.vendor', opts))
       .pipe($.concat('vendor.js')));
-  }
-
-  if (opts.templates) {
-    var hbsFilter = $.filter('**/*.hbs');
-    var emFilter = $.filter('**/*.em');
-    var moduleOptions = {
-      context: function(context) {
-        return { name: context.name.replace(/\./, '/') };
-      }
-    };
-    streams.push(gulp.src(paths('src.app.templates', opts))
-      .pipe($.plumber())
-      .pipe(emFilter)
-      .pipe($.emberEmblem())
-      .pipe($.defineModule('plain', moduleOptions))
-      .pipe(emFilter.restore())
-      .pipe(hbsFilter)
-      .pipe($.emberHandlebars())
-      .pipe($.defineModule('plain', moduleOptions))
-      .pipe(hbsFilter.restore())
-      .pipe($.concat('templates.js')));
   }
 
   if (opts.scripts) {
@@ -284,7 +257,6 @@ tasks['.test:app'] = function(options) {
     path.join(dir, 'vendor.js'),
   ];
   var app = [
-    path.join(dir, 'templates.js'),
     path.join(dir, 'application.js')
   ];
 
@@ -336,10 +308,6 @@ gulp.task('.scripts:app:dev', function() {
 
 gulp.task('.scripts:app:dev:update', function() {
   return tasks['.scripts:app'](_.merge(environment('development'), { scripts: true }));
-});
-
-gulp.task('.scripts:app:dev:update-templates', function() {
-  return tasks['.scripts:app'](_.merge(environment('development'), { templates: true }));
 });
 
 gulp.task('.scripts:app:dist', function() {

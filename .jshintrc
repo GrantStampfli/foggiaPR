@@ -18,8 +18,6 @@
   "trailing": true,
   "smarttabs": true,
   "globals": {
-    "Foggiapr": true,
-    "Ember": true,
-    "DS": true
+    "Foggiapr": true
   }
 }

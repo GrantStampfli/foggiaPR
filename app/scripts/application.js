@@ -1,3 +1,5 @@
 'use strict';
 
-window.Foggiapr = Ember.Application.create();
+$(function() {
+  // your code here
+});
