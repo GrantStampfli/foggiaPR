@@ -2,4 +2,5 @@ node_modules
 tmp
 test
 dist
+info.md
 app/bower_components
